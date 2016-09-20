@@ -49,7 +49,7 @@ class Matcher(object):
         self.allow_bots = allow_bots
 
     def __hash__(self):
-        return self.pattern
+        return hash(self.pattern)
 
     def match(self, msg):
         """ Match according to configured rules.
