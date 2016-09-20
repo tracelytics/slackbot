@@ -68,8 +68,8 @@ class Matcher(object):
 
 
 def respond_to(matchstr, flags=0, key=None, allow_bots=False):
+    matcher = Matcher(matchstr, flags, key, allow_bots)
     def wrapper(func):
-        matcher = Matcher(matchstr, flags, key, allow_bots)
         PluginsManager.commands['respond_to'][matcher] = func
         logger.info('registered respond_to plugin "%s" to "%s"', func.__name__,
                     matchstr)
@@ -79,8 +79,8 @@ def respond_to(matchstr, flags=0, key=None, allow_bots=False):
 
 
 def listen_to(matchstr, flags=0, key=None, allow_bots=False):
+    matcher = Matcher(matchstr, flags, key, allow_bots)
     def wrapper(func):
-        matcher = Matcher(matchstr, flags, key, allow_bots)
         PluginsManager.commands['listen_to'][matcher] = func
         logger.info('registered listen_to plugin "%s" to "%s"', func.__name__,
                     matchstr)
@@ -106,8 +106,8 @@ def default_reply(*args, **kwargs):
     if not invoked:
         func = args[0]
 
+    matcher = Matcher(matchstr, flags, key, allow_bots)
     def wrapper(func):
-        matcher = Matcher(matchstr, flags, key, allow_bots)
         PluginsManager.commands['default_reply'][matcher] = func
         logger.info('registered default_reply plugin "%s" to "%s"', func.__name__,
                     matchstr)
