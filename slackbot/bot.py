@@ -44,6 +44,7 @@ class Bot(object):
 
 class Matcher(object):
     def __init__(self, pattern, flags, key, allow_bots):
+        logger.debug("starting pat [%s] flags [%s] key [%s] allow_bots [%s]", pattern, flags, key, allow_bots)
         self.pattern = re.compile(pattern, flags)
         self.key = key
         self.allow_bots = allow_bots
@@ -58,7 +59,7 @@ class Matcher(object):
         to extract the text.
         Then match the pattern against the text.
         """
-        if not self.allow_self and msg['bot']:
+        if not self.allow_bots and msg['bot']:
             return None
         if key is not None:
             txt = key(msg)
