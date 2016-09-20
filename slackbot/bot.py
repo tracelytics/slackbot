@@ -42,11 +42,35 @@ class Bot(object):
             time.sleep(30 * 60)
             self._client.ping()
 
+class Matcher(object):
+    def __init__(self, pattern, flags, key, allow_bots):
+        self.pattern = re.compile(pattern, flags)
+        self.key = key
+        self.allow_bots = allow_bots
 
-def respond_to(matchstr, flags=0):
+    def __hash__(self):
+        return self.pattern
+
+    def match(self, msg):
+        """ Match according to configured rules.
+        If bot matches are not permitted, and this is a known bot, return immediately.
+        If we have provided a key function, run the key function on the message
+        to extract the text.
+        Then match the pattern against the text.
+        """
+        if not self.allow_self and msg['bot']:
+            return None
+        if key is not None:
+            txt = key(msg)
+        else:
+            txt = msg['text']
+        return self.pattern.search(txt)
+
+
+def respond_to(matchstr, flags=0, key=None, allow_bots=False):
     def wrapper(func):
-        PluginsManager.commands['respond_to'][
-            re.compile(matchstr, flags)] = func
+        matcher = Matcher(matchstr, flags, key, allow_bots)
+        PluginsManager.commands['respond_to'][matcher] = func
         logger.info('registered respond_to plugin "%s" to "%s"', func.__name__,
                     matchstr)
         return func
@@ -54,10 +78,10 @@ def respond_to(matchstr, flags=0):
     return wrapper
 
 
-def listen_to(matchstr, flags=0):
+def listen_to(matchstr, flags=0, key=None, allow_bots=False):
     def wrapper(func):
-        PluginsManager.commands['listen_to'][
-            re.compile(matchstr, flags)] = func
+        matcher = Matcher(matchstr, flags, key, allow_bots)
+        PluginsManager.commands['listen_to'][matcher] = func
         logger.info('registered listen_to plugin "%s" to "%s"', func.__name__,
                     matchstr)
         return func
@@ -76,13 +100,15 @@ def default_reply(*args, **kwargs):
     invoked = bool(not args or kwargs)
     matchstr = kwargs.pop('matchstr', r'^.*$')
     flags = kwargs.pop('flags', 0)
+    key = kwargs.pop('key', None)
+    allow_bots = kwargs.pop('allow_bots', False)
 
     if not invoked:
         func = args[0]
 
     def wrapper(func):
-        PluginsManager.commands['default_reply'][
-            re.compile(matchstr, flags)] = func
+        matcher = Matcher(matchstr, flags, key, allow_bots)
+        PluginsManager.commands['default_reply'][matcher] = func
         logger.info('registered default_reply plugin "%s" to "%s"', func.__name__,
                     matchstr)
         return func

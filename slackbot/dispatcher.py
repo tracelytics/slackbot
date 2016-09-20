@@ -48,7 +48,7 @@ class MessageDispatcher(object):
 
     def _dispatch_msg_handler(self, category, msg):
         responded = False
-        for func, args in self._plugins.get_plugins(category, msg['text']):
+        for func, args in self._plugins.get_plugins(category, msg):
             if func:
                 responded = True
                 try:
@@ -77,6 +77,8 @@ class MessageDispatcher(object):
         if subtype == u'message_changed':
             return
 
+        log.debug("New message: %s", msg)
+
         botname = self._client.login_data['self']['name']
         try:
             msguser = self._client.users.get(msg['user'])
@@ -87,8 +89,10 @@ class MessageDispatcher(object):
             else:
                 return
 
-        if username == botname or username == u'slackbot':
-            return
+        if username == botname or username == "slackbot":
+            msg['bot'] = True
+        else:
+            msg['bot'] = False
 
         msg_respond_to = self.filter_text(msg)
         if msg_respond_to:

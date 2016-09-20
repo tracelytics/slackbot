@@ -21,12 +21,13 @@ class FakePluginManager:
         message.reply('default_okay')
 
     def get_plugins(self, category, message):
-        if message == 'no_plugin_defined':
+        txt = message['text']
+        if txt == 'no_plugin_defined':
             return [[None, None]]
         if category == 'default_reply':
-            return [[getattr(self, 'default_'+message), []]]
+            return [[getattr(self, 'default_'+txt), []]]
         else:
-            return [[getattr(self, message), []]]
+            return [[getattr(self, txt), []]]
 
 
 class FakeClient:
