@@ -44,7 +44,6 @@ class Bot(object):
 
 class Matcher(object):
     def __init__(self, pattern, flags, key, allow_bots):
-        logger.debug("starting pat [%s] flags [%s] key [%s] allow_bots [%s]", pattern, flags, key, allow_bots)
         self.pattern = re.compile(pattern, flags)
         self.key = key
         self.allow_bots = allow_bots
@@ -61,8 +60,8 @@ class Matcher(object):
         """
         if not self.allow_bots and msg['bot']:
             return None
-        if key is not None:
-            txt = key(msg)
+        if self.key is not None:
+            txt = self.key(msg)
         else:
             txt = msg['text']
         return self.pattern.search(txt)

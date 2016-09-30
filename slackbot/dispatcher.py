@@ -77,8 +77,6 @@ class MessageDispatcher(object):
         if subtype == u'message_changed':
             return
 
-        logger.debug("New message: %s", msg)
-
         botname = self._client.login_data['self']['name']
         try:
             msguser = self._client.users.get(msg['user'])
